@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  data_ingestion:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: sqlite:///./finance_db.sqlite
+      ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY}
+
+volumes:
+  db_data:
