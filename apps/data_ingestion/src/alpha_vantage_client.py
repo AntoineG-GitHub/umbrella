@@ -1,13 +1,6 @@
 import requests
-from datetime import datetime, timedelta
 from data_ingestion.src.api_fetcher import APIFetcher
-from django.utils import timezone
-import pandas as pd
-from django.db import connection
-from data_ingestion.models import HistoricalPrice, BaseHistoricalExchangeRate
-from data_ingestion.models import TickerInfo
 import logging
-import yfinance as yf
 
 logger = logging.getLogger(__name__)
 

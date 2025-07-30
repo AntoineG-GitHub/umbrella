@@ -26,8 +26,6 @@ class StockPriceService:
             logger.info(f"Raw prices for {ticker}: {prices_df.head()}")
             prices_df.index = pd.to_datetime(prices_df.index).normalize()
             
-            # logger.info(f"Raw prices for {prices_df.index}")
-
             # Get data for the last 5 years
             end_date = datetime.now()
             start_date = end_date - timedelta(days=1825)  # 5 years
@@ -42,36 +40,19 @@ class StockPriceService:
         except Exception as e:
             logger.error(f"Error processing prices for {ticker}: {e}")
             raise e
-        # Convert to AlphaVantage format
-        time_series = {}
-        for date, row in df.iterrows():
-            date_str = date.strftime('%Y-%m-%d')
-            time_series[date_str] = {
-                "1. open": str(row['1. open']),
-                "2. high": str(row['2. high']),
-                "3. low": str(row['3. low']),
-                "4. close": str(row['4. close']),
-                "5. volume": str(int(row['5. volume']))
-            }
         
-        prices  = time_series
 
         # First check if we have ticker info in the database
-        ticker_info = self.repo.model.objects.filter(ticker=ticker).first()
-        if ticker_info:
-            currency = ticker_info.currency
-        else:
-            # If no data found, fetch from API
-            try:
-                overview = self.client.get_overview(ticker)
-            except Exception as e:
-                logger.error(f"Error fetching the currency for {ticker} with AlphaVantage: {e}")
-                raise e
-            else:
-                currency = overview.get("Currency")
+        try:
+            overview = self.client.get_overview(ticker)
+            currency = overview.get("Currency")
+        except Exception as e:
+            logger.error(f"Error fetching the currency for {ticker} with AlphaVantage: {e}")
+            raise e
+                
             
 
-        currency = "EUR"
+        # currency = "USD"  # TODO: There is a big issue on the currency that is being automatically put to EUR
         logger.info(f"Saving daily prices for {ticker} in {currency}")
         exchange_rates = {}
         if (currency != "EUR"):
@@ -97,6 +78,11 @@ class StockPriceService:
         self.repo.save_prices(ticker, currency, merged)
 
     def save_daily_exchange_rates(self, from_symbol: str, to_symbol="EUR"):
+        """
+        Fetches and saves daily exchange rates from the Alpha Vantage API.
+        This method retrieves daily exchange rates for the specified `from_symbol` and `to_symbol`
+        """
+        logger.info(f"Fetching daily exchange rates from {from_symbol} to {to_symbol}")
         raw_fx = self.client.get_exchange_rates(from_symbol, to_symbol)
         exchange_rates = raw_fx["Time Series FX (Daily)"]
         self.repo.ensure_table_exists()

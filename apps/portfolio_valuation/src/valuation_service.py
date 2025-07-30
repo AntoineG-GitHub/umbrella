@@ -46,6 +46,8 @@ class ValuationService:
         buy = get_sum("buy")
         sell = get_sum("sell")
 
+        logger.debug(f"Deposits: {deposits}, Withdrawals: {withdrawals}, Dividends: {dividends}, Fees: {fees}, Buy: {buy}, Sell: {sell}")
+
         cash = deposits + dividends + sell - (abs(withdrawals) + abs(fees) + abs(buy))
 
         total_value += cash
@@ -83,6 +85,7 @@ class ValuationService:
                 asset_values[ticker] = value
                 total_value += value
             except HistoricalPrice.DoesNotExist:
+                logger.warning(f"Missing historical price for ticker {ticker} on date {self.date}. Skipping this asset.")
                 continue  # Skip missing prices
 
         return total_value
@@ -265,7 +268,7 @@ class ValuationService:
             cash_share = (units / total_units * cash).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) if total_units > 0 else Decimal("0.0")
             
             # Total value is asset value plus cash share
-            total_value = asset_value + cash_share
+            total_value = units*nav_per_unit
             
             user_share_snapshots.append(
                 UserShareSnapshot(

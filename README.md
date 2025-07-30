@@ -103,3 +103,19 @@ Next steps:
 - review the gain loss function
 - create test sets for withdrawal (can be created manually)
 - NO NEGATIVE UNITS IN TRANSACTION TABLE
+
+
+Note: 
+- 30-06-2025 : 16.941.95 (still moving)
+4 msft
+15 nvda
+59 ritm
+2 crm
+
+3 sgld.mi
+50 aristocrat
+
+
+We need to solve the currency issue when data ingestion
+We need to rerun all but nvda and msft on USD 
+we need to add latest dividends and cash transactions

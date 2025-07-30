@@ -31,30 +31,23 @@ def fetch_and_save_data(request, ticker):
                    it is caught and returned in the JSON response.
     """
     try:
-        try: 
-            client = AlphaVantageClient(api_key=os.getenv("ALPHA_VANTAGE_API_KEY"))
-            repository = DatabaseHandler(model=HistoricalPrice)
-            service = StockPriceService(client=client, repository=repository)
-            # raise Exception("Testing AlphaVantageClient") 
+        client = AlphaVantageClient(api_key=os.getenv("ALPHA_VANTAGE_API_KEY"))
+        repository = DatabaseHandler(model=HistoricalPrice)
+        service = StockPriceService(client=client, repository=repository)
 
+        try:
             service.save_daily_prices(ticker)
-            return JsonResponse({
-                "status": "success",
-                "message": f"Data for {ticker} fetched and saved successfully."
-            })
         except Exception as e:
             logger.warning(f"AlphaVantage failed: {e}. Falling back to YahooFinance.")
-
             client = YahooFinanceClient()
             repository = DatabaseHandler(model=HistoricalPrice)
             service = StockPriceService(client=client, repository=repository)
-
             service.save_daily_prices(ticker)
-            return JsonResponse({
-                "status": "success",
-                "message": f"Data for {ticker} fetched and saved successfully."
-            })
-   
+
+        return JsonResponse({
+            "status": "success",
+            "message": f"Data for {ticker} fetched and saved successfully."
+        })
     except Exception as e:
         return JsonResponse({
             "status": "error",
