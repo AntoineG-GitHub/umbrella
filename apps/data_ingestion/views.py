@@ -56,7 +56,7 @@ def fetch_and_save_data(request, ticker):
 
 
 @require_GET
-def get_stock_info(request, ticker):
+def get_company_info(request, ticker):
     """
     Fetches stock information for a given ticker symbol using the Alpha Vantage API 
     and saves the data to the database.

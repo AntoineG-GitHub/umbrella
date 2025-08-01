@@ -1,8 +1,6 @@
 from django.utils import timezone
 from django.db import connection
-import requests
 from datetime import datetime
-from django.utils import timezone
 
 class DatabaseHandler:
     def __init__(self, model, table_name="daily_stock_prices"):

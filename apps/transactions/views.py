@@ -1,8 +1,6 @@
-from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core.serializers import serialize
 from django.forms.models import model_to_dict
 from django.utils.dateparse import parse_date
 from django.db.models import Q
@@ -10,10 +8,6 @@ from rest_framework import status
 from .models import Transaction
 import json
 from django.contrib.auth import get_user_model
-
-
-from .models import Transaction
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -87,6 +81,7 @@ def get_transaction(request, transaction_id):
         return JsonResponse({"status": "error", "message": "Transaction not found."}, status=404)
 
 
+@require_http_methods(["POST"])
 def delete_transaction(request, transaction_id):
     try:
         transaction = Transaction.objects.get(id=transaction_id)
@@ -94,8 +89,6 @@ def delete_transaction(request, transaction_id):
         return JsonResponse({"message": f"Transaction {id} deleted successfully."}, status=status.HTTP_200_OK)
     except Transaction.DoesNotExist:
         return JsonResponse({"error": "Transaction not found."}, status=status.HTTP_404_NOT_FOUND)
-
-
 
 User = get_user_model()
 

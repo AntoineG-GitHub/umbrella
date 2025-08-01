@@ -1,12 +1,6 @@
 from django.test import TestCase
-from django.test import TestCase
-from django.urls import reverse
-from unittest.mock import Mock, patch, MagicMock
-from decimal import Decimal
+from unittest.mock import Mock
 from data_ingestion.src.stock_price_service import StockPriceService
-from data_ingestion.src.database_handler import DatabaseHandler
-from data_ingestion.src.alpha_vantage_client import AlphaVantageClient
-from data_ingestion.models import TickerInfo, HistoricalPrice, BaseHistoricalExchangeRate
 
 class TestStockPriceService(TestCase):
     def setUp(self):

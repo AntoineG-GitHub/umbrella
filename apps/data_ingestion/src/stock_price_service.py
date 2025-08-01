@@ -1,4 +1,3 @@
-from data_ingestion.src.alpha_vantage_client import AlphaVantageClient
 from data_ingestion.src.database_handler import DatabaseHandler
 from data_ingestion.src.api_fetcher import APIFetcher
 from data_ingestion.models import BaseHistoricalExchangeRate
@@ -23,7 +22,6 @@ class StockPriceService:
         prices = raw_prices["Time Series (Daily)"]
         try: 
             prices_df = pd.DataFrame.from_dict(prices, orient='index')
-            logger.info(f"Raw prices for {ticker}: {prices_df.head()}")
             prices_df.index = pd.to_datetime(prices_df.index).normalize()
             
             # Get data for the last 5 years
@@ -36,11 +34,9 @@ class StockPriceService:
 
             # Forward fill to replace empty values with previous day's data
             df = df.ffill()
-            print(f"Processed prices for {df.head()}")
         except Exception as e:
             logger.error(f"Error processing prices for {ticker}: {e}")
             raise e
-        
 
         # First check if we have ticker info in the database
         try:
@@ -49,10 +45,7 @@ class StockPriceService:
         except Exception as e:
             logger.error(f"Error fetching the currency for {ticker} with AlphaVantage: {e}")
             raise e
-                
-            
 
-        # currency = "USD"  # TODO: There is a big issue on the currency that is being automatically put to EUR
         logger.info(f"Saving daily prices for {ticker} in {currency}")
         exchange_rates = {}
         if (currency != "EUR"):

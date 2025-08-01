@@ -14,7 +14,9 @@ The source folder contains the main application logic divided into three modules
 2. The database_handler: It manages the database operations which is saving to the database and checking if the table already exists.
 3. The stock_price_service: It handles the raw data from the API client and post process it to add euro values to save it to the final table. 
 
-Note : The readers file used to read the data from the database and return it in a structured format. This is for the get-prices, get-exchange-rates requests.
+Note : The readers file are used to read the data from the database and return it in a structured format. This is for the get-prices, get-exchange-rates requests.
+
+The logic is to instantiate the api client and the database handler to give it to the stock_price_service. The stock_price_service will then use the api client to fetch the data and the database_handler to save it to the database.
 
 ## Models
 ### HistoricalPrice

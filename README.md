@@ -119,3 +119,5 @@ Note:
 We need to solve the currency issue when data ingestion
 We need to rerun all but nvda and msft on USD 
 we need to add latest dividends and cash transactions
+
+to connect to EC instance: ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
