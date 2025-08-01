@@ -1,28 +1,20 @@
-[project]
+[tool.poetry]
 name = "data_ingestion"
 version = "0.1.0"
 description = "Ingestion of the historical data to store it locally"
-authors = [
-    {name = "AntoineG-GitHub",email = "antoinegeller@hotmail.com"}
-]
+authors = ["AntoineG-GitHub <antoinegeller@hotmail.com>"]
 readme = "README.md"
-requires-python = ">=3.9"
-dependencies = [
-    "django (>=3.1.3)",
-    "requests (>=2.32.3,<3.0.0)",
-    "python-dotenv (>=1.0.1,<2.0.0)",
-    "pandas (>=2.2.3,<3.0.0)",
-    "djangorestframework (>=3.16.0,<4.0.0)",
-    "pandas-market-calendars (>=5.1.0,<6.0.0)",
-    "yfinance (>=0.2.61,<0.3.0)",
-]
 
+[tool.poetry.dependencies]
+python = ">=3.9"
+django = ">=3.1.3"
+requests = ">=2.32.3,<3.0.0"
+python-dotenv = ">=1.0.1,<2.0.0"
+pandas = ">=2.2.3,<3.0.0"
+djangorestframework = ">=3.16.0,<4.0.0"
+pandas-market-calendars = ">=5.1.0,<6.0.0"
+yfinance = ">=0.2.61,<0.3.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-packages = [
-    { include = "core", from = "src" }
-]

@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-$2=4u@(ta64!+((9d6%40tkk0o3!_f^^89%sh4zqnv+@gi_&rw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 AUTH_USER_MODEL = "transactions.CustomUser"
 
 # Application definition

@@ -1,2 +1,5 @@
 **/__pycache__/
 .vscode/
+poetry.lock
+umbrella-key-ec2.pem
+.env
