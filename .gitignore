@@ -1,5 +1,7 @@
 **/__pycache__/
 .vscode/
+.notebooks/
+.scripts/
 poetry.lock
 umbrella-key-ec2.pem
 .env

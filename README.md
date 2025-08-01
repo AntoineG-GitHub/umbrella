@@ -121,3 +121,4 @@ We need to rerun all but nvda and msft on USD
 we need to add latest dividends and cash transactions
 
 to connect to EC instance: ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
+to copy to the instance: scp -i umbrella-key-ec2.pem -r ./apps ec2-user@51.21.224.128:/home/ec2-user/umbrella_app 
