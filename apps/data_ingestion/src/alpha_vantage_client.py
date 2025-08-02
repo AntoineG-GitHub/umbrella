@@ -41,10 +41,11 @@ class AlphaVantageClient(APIFetcher):
         }
         response = requests.get(self.api_url, params=params)
         response.raise_for_status()
-        if response.empty:
+        data = response.json()
+        if not data:
             logger.warning(f"No data found for ticker: {ticker}")
             raise ValueError(f"No data found for ticker: {ticker}")
-        return response.json()
+        return data
 
     def get_exchange_rates(self, from_symbol: str, to_symbol="EUR") -> dict:
         """

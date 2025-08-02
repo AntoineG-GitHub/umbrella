@@ -38,7 +38,7 @@ class StockPriceService:
             logger.error(f"Error processing prices for {ticker}: {e}")
             raise e
 
-        # First check if we have ticker info in the database
+        # Check currency to have prices in euro 
         try:
             overview = self.client.get_overview(ticker)
             currency = overview.get("Currency")

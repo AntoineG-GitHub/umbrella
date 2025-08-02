@@ -1,5 +1,4 @@
 import yfinance as yf
-import pandas as pd
 import logging
 from datetime import datetime, timedelta
 
