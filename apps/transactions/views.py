@@ -1,4 +1,4 @@
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST, require_GET
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
@@ -10,8 +10,8 @@ import json
 from django.contrib.auth import get_user_model
 
 @csrf_exempt
-@require_http_methods(["POST"])
-def create_transaction(request):
+@require_POST
+def add_transaction(request):
     """
     Create a new transaction.
     Expects a JSON body with:
@@ -25,25 +25,57 @@ def create_transaction(request):
     """
     try:
         data = json.loads(request.body)
+
+        # Basic validation
+        required_fields = ["type", "amount", "date"]
+        for field in required_fields:
+            if field not in data:
+                return JsonResponse({"status": "error", "message": f"Missing field: {field}"}, status=400)
+
+        if data["type"] not in {"deposit", "withdrawal", "buy", "sell", "dividend", "fee"}:
+            return JsonResponse({"status": "error", "message": f"Invalid type: {data['type']}"}, status=400)
+        
+        if data["type"] in {'buy', 'sell'} and ('ticker' not in data or 'shares' not in data):
+            return JsonResponse({"status": "error", "message": "Ticker and shares are required for buy/sell transactions."}, status=400)
+
+        if data["type"] in {'deposit', 'withdrawal'} and ('user_id' not in data):
+            return JsonResponse({"status": "error", "message": "User ID is required for deposit/withdrawal transactions."}, status=400)
+
+        # TODO: Validate the user ID to avoid having non existing users
+
+        date = parse_date(data["date"])
+        if not date:
+            return JsonResponse({"status": "error", "message": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+        # Create transaction
         transaction = Transaction.objects.create(
-            type=data["type"],
-            amount=data["amount"],
-            date=parse_date(data["date"]),
+            type=data.get("type"),
+            amount=float(data["amount"]),
+            date=date,
             user_id=data.get("user_id"),
             ticker=data.get("ticker"),
             shares=data.get("shares"),
             metadata=data.get("metadata", {})
         )
-        return JsonResponse({"status": "success", "transaction": model_to_dict(transaction)}, status=201)
+
+        return JsonResponse({
+            "status": "success",
+            "message": f"Transaction {transaction.id} was successfully added.",
+            "transaction": model_to_dict(transaction)
+        }, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "Invalid JSON format."}, status=400)
     except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=400)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 
-@require_http_methods(["GET"])
-def list_transactions(request):
+@require_GET
+def get_transaction(request):
     """
     List transactions with optional filters:
     - type
+    - id
     - start_date
     - end_date
     - user_id
@@ -51,6 +83,8 @@ def list_transactions(request):
     """
     try:
         filters = Q()
+        if id_ := request.GET.get("id"):
+            filters &= Q(id=id_)
         if type_ := request.GET.get("type"):
             filters &= Q(type=type_)
         if start_date := request.GET.get("start_date"):
@@ -69,24 +103,17 @@ def list_transactions(request):
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
-@require_http_methods(["GET"])
-def get_transaction(request, transaction_id):
-    """
-    Get a single transaction by its ID.
-    """
-    try:
-        txn = Transaction.objects.get(id=transaction_id)
-        return JsonResponse({"status": "success", "data": model_to_dict(txn)})
-    except Transaction.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Transaction not found."}, status=404)
-
-
-@require_http_methods(["POST"])
+@csrf_exempt
+@require_POST
 def delete_transaction(request, transaction_id):
+    """
+    Delete a transaction by ID.
+    Expects the transaction ID in the URL.
+    """
     try:
         transaction = Transaction.objects.get(id=transaction_id)
         transaction.delete()
-        return JsonResponse({"message": f"Transaction {id} deleted successfully."}, status=status.HTTP_200_OK)
+        return JsonResponse({"message": f"Transaction {transaction_id} deleted successfully."}, status=status.HTTP_200_OK)
     except Transaction.DoesNotExist:
         return JsonResponse({"error": "Transaction not found."}, status=status.HTTP_404_NOT_FOUND)
 
