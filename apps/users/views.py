@@ -12,16 +12,20 @@ User = get_user_model()
 def create_user(request):
     try:
         data = json.loads(request.body)
+        username = data.get("email")
         first_name = data.get("first_name", "")
         last_name = data.get("last_name", "")
-        phone = data.get("phone", "")
         password = data.get("password")
-        email = data.get("email", "")
 
-        if not first_name or not password:
-            return JsonResponse({"error": "Name and password are required."}, status=400)
+        if not username or not password:
+            return JsonResponse({"error": "Email and password are required."}, status=400)
 
-        user = User.objects.create_user(first_name=first_name, last_name=last_name, password=password, email=email, phone=phone)
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name
+        )
         return JsonResponse({"status": "success", "user_id": user.id})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
@@ -46,7 +50,7 @@ def get_user(request):
     if first_name:
         filters["first_name"] = first_name
 
-    users = User.objects.filter(**filters).values("id", "first_name", "last_name", "email", "phone")
+    users = User.objects.filter(**filters).values("id", "first_name", "last_name", "email")
 
     return JsonResponse(list(users), safe=False)
 

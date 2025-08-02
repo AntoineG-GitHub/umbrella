@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('data_ingestion/', include('data_ingestion.urls')),
     path("transactions/", include("transactions.urls")),
-    path("portfolio_valuation/", include("portfolio_valuation.urls"))
+    path("portfolio_valuation/", include("portfolio_valuation.urls")),
+    path("users/", include("users.urls")),
 ]
