@@ -15,30 +15,12 @@ class StockPriceService:
     def __init__(self, client: APIFetcher, repository: DatabaseHandler):
         self.client = client
         self.repo = repository
+    
+    def _get_currency(self, ticker: str) -> str:
+        """
+        Fetches the currency of the stock ticker from the API.
+        """
 
-    def save_daily_prices(self, ticker: str):
-        logger.info(f"Fetching daily prices for {ticker}")
-        raw_prices = self.client.get_daily_time_series(ticker)
-        prices = raw_prices["Time Series (Daily)"]
-        try: 
-            prices_df = pd.DataFrame.from_dict(prices, orient='index')
-            prices_df.index = pd.to_datetime(prices_df.index).normalize()
-            
-            # Get data for the last 5 years
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=1825)  # 5 years
-
-            # Create a DataFrame with all weekdays in the date range, with timezone-aware datetime
-            all_weekdays = pd.date_range(start=start_date, end=end_date, freq='B').normalize()
-            df = prices_df.reindex(all_weekdays)
-
-            # Forward fill to replace empty values with previous day's data
-            df = df.ffill()
-        except Exception as e:
-            logger.error(f"Error processing prices for {ticker}: {e}")
-            raise e
-
-        # Check currency to have prices in euro 
         try:
             overview = self.client.get_overview(ticker)
             currency = overview.get("Currency")
@@ -46,10 +28,8 @@ class StockPriceService:
             logger.error(f"Error fetching the currency for {ticker} with AlphaVantage: {e}")
             raise e
 
-        logger.info(f"Saving daily prices for {ticker} in {currency}")
         exchange_rates = {}
         if (currency != "EUR"):
-            # First check if we have exchange rates in the database
             exchange_rates = BaseHistoricalExchangeRate.objects.filter(from_currency=currency).values('date', 'close')
             if not exchange_rates:
                 # If no data found, fetch from API
@@ -62,12 +42,41 @@ class StockPriceService:
                     for rate in exchange_rates
                 }
 
+        return currency, exchange_rates
+
+    def save_daily_prices(self, ticker: str):
+        """
+        Fetches and saves daily stock prices for the given ticker.
+        This method retrieves daily stock prices, enriches them with exchange rates if necessary,
+        and saves the data to the database.
+        """
+        logger.info(f"Fetching daily prices for {ticker}")
+        raw_prices = self.client.get_daily_time_series(ticker)
+        prices = raw_prices["Time Series (Daily)"]
+
+        prices_df = pd.DataFrame.from_dict(prices, orient='index')
+        prices_df.index = pd.to_datetime(prices_df.index).normalize()
+        
+        # Get data for the last 5 years
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=1825)  # 5 years
+
+        # Create a DataFrame with all weekdays in the date range, with timezone-aware datetime
+        all_weekdays = pd.date_range(start=start_date, end=end_date, freq='B').normalize()
+        df = prices_df.reindex(all_weekdays)
+
+        # Forward fill to replace empty values with previous day's data
+        df = df.ffill()
+
+        currency, exchange_rates = self._get_currency(ticker)
+
         merged = {}
         for date, price_data in prices.items():
             exchange_rate = exchange_rates.get(date, {}).get("4. close", 1)
             merged[date] = {**price_data, "exchange_rate": exchange_rate}
 
         self.repo.ensure_table_exists()
+        logger.info(f"Saving daily prices for {ticker} in {currency}")
         self.repo.save_prices(ticker, currency, merged)
 
     def save_daily_exchange_rates(self, from_symbol: str, to_symbol="EUR"):

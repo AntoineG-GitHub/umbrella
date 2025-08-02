@@ -1,4 +1,3 @@
-# apps/data_ingestion/urls.py
 from django.urls import path
 from data_ingestion import views
 

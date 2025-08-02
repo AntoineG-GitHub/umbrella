@@ -40,6 +40,7 @@ class TestStockPriceService(TestCase):
         # Verify repo calls
         self.mock_repo.ensure_table_exists.assert_called_once()
         self.mock_repo.save_prices.assert_called_once()
+        
 
     def test_save_daily_prices_usd(self):
         """
