@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-$2=4u@(ta64!+((9d6%40tkk0o3!_f^^89%sh4zqnv+@gi_&rw
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-AUTH_USER_MODEL = "transactions.CustomUser"
+AUTH_USER_MODEL = "users.CustomUser"
 
 # Application definition
 
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'data_ingestion',
     'transactions',
     'portfolio_valuation',
+    'users',
     'corsheaders',
 ]
 

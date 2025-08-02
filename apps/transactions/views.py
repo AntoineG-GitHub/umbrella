@@ -7,7 +7,7 @@ from django.db.models import Q
 from rest_framework import status
 from .models import Transaction
 import json
-from django.contrib.auth import get_user_model
+
 
 @csrf_exempt
 @require_POST
@@ -116,28 +116,3 @@ def delete_transaction(request, transaction_id):
         return JsonResponse({"message": f"Transaction {transaction_id} deleted successfully."}, status=status.HTTP_200_OK)
     except Transaction.DoesNotExist:
         return JsonResponse({"error": "Transaction not found."}, status=status.HTTP_404_NOT_FOUND)
-
-User = get_user_model()
-
-@csrf_exempt
-def create_user(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            username = data.get("username")
-            password = data.get("password")
-            email = data.get("email", "")
-
-            if not username or not password:
-                return JsonResponse({"error": "Username and password are required."}, status=400)
-
-            user = User.objects.create_user(username=username, password=password, email=email)
-            return JsonResponse({"status": "success", "user_id": user.id})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    else:
-        return JsonResponse({"error": "Only POST allowed."}, status=405)
-
-def list_users(request):
-    users = User.objects.all().values("id", "username", "email", "date_joined")
-    return JsonResponse(list(users), safe=False)

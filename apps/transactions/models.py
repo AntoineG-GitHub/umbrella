@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
 class Transaction(models.Model):
@@ -28,5 +27,3 @@ class Transaction(models.Model):
     def __str__(self):
         return f"{self.date} - {self.type} - {self.amount} EUR"
 
-class CustomUser(AbstractUser):
-    pass
