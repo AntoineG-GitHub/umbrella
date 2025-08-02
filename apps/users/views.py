@@ -9,7 +9,7 @@ User = get_user_model()
 
 @csrf_exempt
 @require_POST
-def create_user(request):
+def add_user(request):
     try:
         data = json.loads(request.body)
         username = data.get("email")
@@ -50,7 +50,7 @@ def get_user(request):
     if first_name:
         filters["first_name"] = first_name
 
-    users = User.objects.filter(**filters).values("id", "first_name", "last_name", "email")
+    users = User.objects.filter(**filters).values("id", "first_name", "last_name", "username", "password")
 
     return JsonResponse(list(users), safe=False)
 
