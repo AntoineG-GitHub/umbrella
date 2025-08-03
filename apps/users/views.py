@@ -1,8 +1,7 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
-from django.contrib.auth import authenticate, login
 import json
 
 User = get_user_model()
@@ -57,12 +56,17 @@ def get_user(request):
 @csrf_exempt
 @require_POST
 def login_user(request):
+    """
+    Log in a user with email and password.
+    Returns a JSON response with status and message.
+    """
     try:
         data = json.loads(request.body)
         username = data.get("username")
         password = data.get("password")
 
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
             login(request, user)
             return JsonResponse({"status": "success", "message": "Logged in successfully."})
