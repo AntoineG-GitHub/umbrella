@@ -29,13 +29,13 @@ Contains metadata about financial instruments, such as name, sector, industry, a
 
 ## API Endpoints
 ### Stock Price Data
-- **Get Prices**: `/get_prices/<str:ticker>/`
+- **Get Prices**: `/get_prices/<str:ticker>/` - Used to retrieve historical price data for a specific ticker. The response includes OHLCV data in both the original currency and EUR equivalent.
 
 ### Exchange Rate Data
-- **Get Exchange Rates**: `/get_exchange_rates/<str:from_currency>/`
+- **Get Exchange Rates**: `/get_exchange_rates/<str:from_currency>/` - Used to retrieve daily exchange rates for a specified currency against EUR by default. The response includes OHLC values.
 
 ### Company Information
-- **Get Company Info**: `/get_company_info/<str:ticker>/`
+- **Get Company Info**: `/get_company_info/<str:ticker>/` - Used to retrieve metadata for a specific ticker, including sector, industry, and financial ratios.
 
 ## Admin Panel
 The app provides an admin interface for managing data:
