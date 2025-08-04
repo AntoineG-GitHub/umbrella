@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "umbrella"
 version = "0.1.0"
-description = "Ingestion of the historical data to store it locally"
+description = "Umbrella backend app for the Umbrella Fund"
 authors = ["AntoineG-GitHub <antoinegeller@hotmail.com>"]
 readme = "README.md"
 
@@ -19,3 +19,5 @@ django-cors-headers = "^4.7.0"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
