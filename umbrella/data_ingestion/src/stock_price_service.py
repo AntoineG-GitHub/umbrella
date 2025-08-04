@@ -1,8 +1,6 @@
-import os 
 from data_ingestion.src.database_handler import DatabaseHandler
 from data_ingestion.src.api_fetcher import APIFetcher
 from data_ingestion.models import BaseHistoricalExchangeRate
-from data_ingestion.src.alpha_vantage_client import AlphaVantageClient
 import logging
 from datetime import datetime, timedelta
 import pandas as pd

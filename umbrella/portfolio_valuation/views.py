@@ -7,16 +7,11 @@ from django.views.decorators.http import require_GET
 from portfolio_valuation.models import DailyPortfolioSnapshot
 from django.forms.models import model_to_dict
 from datetime import timedelta
-import pandas_market_calendars as mcal
 from django.views import View
 from portfolio_valuation.models import UserShareSnapshot
 from django.core.exceptions import ValidationError
-from transactions.models import Transaction
-from decimal import Decimal
-from datetime import datetime
-from django.db.models import Sum
 
-from portfolio_valuation.src.valuation_service import ValuationService
+from portfolio_valuation.src.valuation import ValuationService
 
 
 class ComputeValuationView(APIView):

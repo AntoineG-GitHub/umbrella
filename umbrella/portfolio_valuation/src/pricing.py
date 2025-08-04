@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def get_fund_value(date) -> Decimal:
+def get_investment_value(date) -> Decimal:
     asset_values = {}
     total_value = Decimal("0.0")
 
@@ -46,9 +46,11 @@ def get_fund_value(date) -> Decimal:
             price = HistoricalPrice.objects.get(ticker=ticker, date=date)
             close_eur = price.close_euro
             value = (net_qty * close_eur).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-            asset_values[ticker] = value
+            asset_values[ticker] = (value, net_qty)
             total_value += value
         except HistoricalPrice.DoesNotExist:
             logger.warning(f"Missing historical price for {ticker} on {date}")
+    
+    logger.info(f"Assets in the portfolio: {asset_values}")
 
     return total_value

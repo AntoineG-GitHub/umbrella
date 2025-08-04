@@ -6,10 +6,11 @@ from django.db import transaction as db_transaction
 from transactions.models import Transaction
 from portfolio_valuation.models import DailyPortfolioSnapshot, UserShareSnapshot
 
-from pricing import get_fund_value
-from nav import get_previous_units, get_previous_user_units, get_nav_per_unit
-from metrics import compute_total_metrics
+from .pricing import get_investment_value
+from .nav import get_previous_units, get_previous_user_units, get_nav_per_unit
+from .metrics import compute_total_metrics
 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class ValuationService:
@@ -19,8 +20,8 @@ class ValuationService:
     @db_transaction.atomic
     def compute(self):
         logger.info(f"Starting valuation for {self.date}")
-        fund_value = get_fund_value(self.date)
-        logger.debug(f"Fund value: {fund_value}")
+        fund_value = get_investment_value(self.date)
+        logger.debug(f"Portfolio value: {fund_value}")
 
         nav = get_nav_per_unit(self.date)
         prev_units = get_previous_units(self.date)
