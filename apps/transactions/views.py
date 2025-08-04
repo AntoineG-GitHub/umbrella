@@ -41,8 +41,6 @@ def add_transaction(request):
         if data["type"] in {'deposit', 'withdrawal'} and ('user_id' not in data):
             return JsonResponse({"status": "error", "message": "User ID is required for deposit/withdrawal transactions."}, status=400)
 
-        # TODO: Validate the user ID to avoid having non existing users
-
         date = parse_date(data["date"])
         if not date:
             return JsonResponse({"status": "error", "message": "Invalid date format. Use YYYY-MM-DD."}, status=400)

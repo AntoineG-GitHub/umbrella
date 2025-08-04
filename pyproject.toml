@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "data_ingestion"
+name = "umbrella"
 version = "0.1.0"
 description = "Ingestion of the historical data to store it locally"
 authors = ["AntoineG-GitHub <antoinegeller@hotmail.com>"]

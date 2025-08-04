@@ -38,61 +38,6 @@ We need another function with the whole purpose of fetching and returning the da
 
 ### Unit based Accounting
 
-What You Track:
-- The total value of the portfolio at any given point.
-- The units of the fund issued to each person when they deposit.
-- The price per unit changes as the portfolio's total value changes.
-- When someone withdraws, they “sell” units at the current unit price.
-
-1. Initialize the portfolio
-Let’s say:
- - Total portfolio value is €0.
- - No units exist.
-
-2. First deposit
-A adds 100€ in the portfolio
-- set initial price of 1€/unit 
-- A gets 1000 units in the portfolio 
-    - Total portfolio value : 1000€
-    - Total units: 1000
-
-3. Second deposit
-Value before the deposit:
-- unit price : 1.10€
-- total portfolio value: 1100€ 
-- total units: 1000
-Person B adds 500€ (after th portfolio grew to 1100€):
-- total portfolio value: 1600€
-- B gets 500€/1.10€ ~=454.55 units 
-- total units: 1454.55
-- price/units = 1.10€
-
-4. Portfolio grows to 1800€
-Value update:
-- total units: 1454.55
-- total value: 1800€ 
-- unit price: 1800/1454.55 ~= 1.237€
-
-5. Person A withdraws  618.50€
-- unit price = 1.237€
-- A wants 618.50€ -> 618.50/1.237 ~= 500 units 
-- A owns 500 units and B 454.55 units
-- new portfolio value: 1181.50€
-- total units: 954.55
-
-Your system is event-driven, but valuations are time-driven.
-
-Even if no transaction happened that day (no buys, sells, deposits, etc.), the market prices could have changed → so portfolio value changes anyway.
-
-You want to track:
-
-the portfolio value daily 📈,
-
-the units price daily 📊,
-
-and thus the shares of each user daily 📅.
-
-👉 So you must generate a new valuation snapshot every single day, even if there was no action.
 
 
 admin: antoine
@@ -102,7 +47,6 @@ pwd: 123456
 Next steps:
 - review the gain loss function
 - create test sets for withdrawal (can be created manually)
-- NO NEGATIVE UNITS IN TRANSACTION TABLE
 
 
 Note: 
@@ -115,10 +59,9 @@ Note:
 3 sgld.mi
 50 aristocrat
 
-
-We need to solve the currency issue when data ingestion
-We need to rerun all but nvda and msft on USD 
 we need to add latest dividends and cash transactions
 
 to connect to EC instance: ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
 to copy to the instance: scp -i umbrella-key-ec2.pem -r ./apps ec2-user@51.21.224.128:/home/ec2-user/umbrella_app 
+
+python .\manage.py createsuperuser

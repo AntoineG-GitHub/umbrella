@@ -1,6 +1,8 @@
+import os 
 from data_ingestion.src.database_handler import DatabaseHandler
 from data_ingestion.src.api_fetcher import APIFetcher
 from data_ingestion.models import BaseHistoricalExchangeRate
+from data_ingestion.src.alpha_vantage_client import AlphaVantageClient
 import logging
 from datetime import datetime, timedelta
 import pandas as pd
@@ -24,17 +26,16 @@ class StockPriceService:
         try:
             overview = self.client.get_overview(ticker)
             currency = overview.get("Currency")
+            logging.info(f"Currency for {ticker} is {currency}")
         except Exception as e:
-            logger.error(f"Error fetching the currency for {ticker} with AlphaVantage: {e}")
+            logger.error(f"Error fetching the currency for {ticker}: {e}")
             raise e
 
         exchange_rates = {}
         if (currency != "EUR"):
             exchange_rates = BaseHistoricalExchangeRate.objects.filter(from_currency=currency).values('date', 'close')
             if not exchange_rates:
-                # If no data found, fetch from API
-                raw_fx = self.client.get_exchange_rates(currency)
-                exchange_rates = raw_fx["Time Series FX (Daily)"]
+                raise ValueError(f"No exchange rates found for {currency} in the database or API response.")
             else:
                 # Convert database results to expected format
                 exchange_rates = {
