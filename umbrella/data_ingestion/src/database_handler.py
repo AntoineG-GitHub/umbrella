@@ -77,6 +77,7 @@ class DatabaseHandler:
         )
     
     def save_daily_exchange_rates(self, from_currency, to_currency, data):
+        print(f"Saving exchange rates from {from_currency} to {to_currency}")
         self.model.objects.filter(from_currency=from_currency).delete()
         for date, value in data.items():
             naive_datetime = datetime.strptime(date, "%Y-%m-%d")

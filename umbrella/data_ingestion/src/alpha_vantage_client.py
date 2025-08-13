@@ -60,4 +60,8 @@ class AlphaVantageClient(APIFetcher):
         }
         response = requests.get(self.api_url, params=params)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        if not data:
+            logger.warning(f"No data found for rates: {from_symbol} to {to_symbol}")
+            raise ValueError(f"No data found for rates: {from_symbol} to {to_symbol}")
+        return data
