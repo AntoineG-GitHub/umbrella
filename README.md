@@ -61,7 +61,8 @@ Note:
 
 we need to add latest dividends and cash transactions
 
-to connect to EC instance: ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
+to connect to EC instance: 
 to copy to the instance: scp -i umbrella-key-ec2.pem -r ./apps ec2-user@51.21.224.128:/home/ec2-user/umbrella_app 
 
 python .\manage.py createsuperuser
+ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128

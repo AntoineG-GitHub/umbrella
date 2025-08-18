@@ -23,4 +23,3 @@ Represents a user in the system with fields for username, email, password, and o
 ## Security
 
 The password management and authentication is done through Django framework features, ensuring that user credentials are stored securely and that authentication processes are robust against common vulnerabilities. 
-
