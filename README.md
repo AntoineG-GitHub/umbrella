@@ -44,25 +44,13 @@ admin: antoine
 pwd: 123456
 
 
-Next steps:
-- review the gain loss function
-- create test sets for withdrawal (can be created manually)
 
-
-Note: 
-- 30-06-2025 : 16.941.95 (still moving)
-4 msft
-15 nvda
-59 ritm
-2 crm
-
-3 sgld.mi
-50 aristocrat
-
-we need to add latest dividends and cash transactions
-
-to connect to EC instance: 
+to connect to EC instance:  ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
 to copy to the instance: scp -i umbrella-key-ec2.pem -r ./apps ec2-user@51.21.224.128:/home/ec2-user/umbrella_app 
 
 python .\manage.py createsuperuser
 ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
+
+docker build -t umbrella-app .
+
+docker run -d --name umbrella-app-container -p 8000:8000   --env-file /home/ec2-user/umbrella/.env   -v /home/ec2-user/umbrella/database/db.sqlite3:/database/db.sqlite3   umbrella-app:latest

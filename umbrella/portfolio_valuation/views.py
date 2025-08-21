@@ -12,20 +12,22 @@ def get_portfolio_valuations(request):
     """
     Get daily portfolio valuations over a specified time period.
     Query parameters:
-        - start_date (YYYY-MM-DD)
-        - end_date (YYYY-MM-DD)
+        - start_date (YYYY-MM-DD, optional)
+        - end_date (YYYY-MM-DD, optional)
     """
     start_date = request.GET.get("start_date")
     end_date = request.GET.get("end_date")
 
-    if not start_date or not end_date:
-        return JsonResponse({
-            "status": "error",
-            "message": "start_date and end_date query parameters are required."
-        }, status=400)
+    valuations_query = DailyPortfolioSnapshot.objects.all()
 
-    valuations = DailyPortfolioSnapshot.objects.filter(date__range=[start_date, end_date]).order_by("date")
+    if start_date and end_date:
+        valuations_query = valuations_query.filter(date__range=[start_date, end_date])
+    elif start_date:
+        valuations_query = valuations_query.filter(date__gte=start_date)
+    elif end_date:
+        valuations_query = valuations_query.filter(date__lte=end_date)
 
+    valuations = valuations_query.order_by("date")
     data = [model_to_dict(v) for v in valuations]
 
     return JsonResponse({
