@@ -30,8 +30,8 @@ RUN poetry config virtualenvs.create false \
 COPY . .
 
 # Create a non-root user
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /umbrella
-USER appuser
+#RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /umbrella
+#USER appuser
 
 WORKDIR /umbrella
 

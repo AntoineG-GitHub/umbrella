@@ -40,17 +40,18 @@ class UserShareSnapshotView(View):
         start_date_str = request.GET.get("start_date")
         end_date_str = request.GET.get("end_date")
 
-        try:
-            start_date = parse_date(start_date_str)
-            end_date = parse_date(end_date_str)
-            if not start_date or not end_date:
-                raise ValidationError("Invalid date format.")
-        except Exception:
-            return JsonResponse({"error": "Invalid or missing date format (YYYY-MM-DD expected)."}, status=400)
+        start_date = parse_date(start_date_str) if start_date_str else None
+        end_date = parse_date(end_date_str) if end_date_str else None
 
-        snapshots = UserShareSnapshot.objects.filter(
-            user_id=user_id, date__range=[start_date, end_date]
-        ).order_by("date")
+        snapshots_query = UserShareSnapshot.objects.filter(user_id=user_id)
+        if start_date and end_date:
+            snapshots_query = snapshots_query.filter(date__range=[start_date, end_date])
+        elif start_date:
+            snapshots_query = snapshots_query.filter(date__gte=start_date)
+        elif end_date:
+            snapshots_query = snapshots_query.filter(date__lte=end_date)
+
+        snapshots = snapshots_query.order_by("date")
 
         data = [
             {
