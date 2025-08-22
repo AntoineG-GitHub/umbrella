@@ -10,9 +10,9 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./umbrella/.env
+      - .env
     volumes:
-      - ./umbrella/database/db.sqlite3:/database/db.sqlite3
+      - ./database/db.sqlite3:/database/db.sqlite3
     command: >
       python manage.py runserver 0.0.0.0:8000
     restart: always
