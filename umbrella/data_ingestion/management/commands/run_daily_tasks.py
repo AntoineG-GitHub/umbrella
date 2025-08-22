@@ -19,10 +19,17 @@ class Command(BaseCommand):
             failed.append("exchange_rates")
 
         # 2. Fetch stock data for all tickers
-        tickers = ["AMD", "CRM", "NVDA", "MSFT", "PHYS", "RITM", "SGLD.MI", "SPYD.DE", "SXLP.MI", "WIX"]
+        tickers = ["AMD", "CRM", "NVDA", "MSFT", "PHYS", "RITM", "SGLD.MI", "SPYD.DE", "SXLP.MI", "WIX", "SPY"]
 
         for ticker in tickers:
             self.stdout.write(f"Fetching data for {ticker}...")
+            try:
+                call_command("fetch_company_info", f"--ticker={ticker}")
+                self.stdout.write(self.style.SUCCESS(f"Successfully fetched company info for {ticker}"))
+                success.append(ticker)
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Failed to fetch company info for {ticker}: {e}"))
+                failed.append(ticker)
             try:
                 call_command("fetch_stock_data", f"--ticker={ticker}")
                 self.stdout.write(self.style.SUCCESS(f"Successfully fetched data for {ticker}"))
