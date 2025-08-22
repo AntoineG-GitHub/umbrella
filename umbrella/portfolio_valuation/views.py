@@ -5,7 +5,9 @@ from portfolio_valuation.models import DailyPortfolioSnapshot
 from django.forms.models import model_to_dict
 from django.views import View
 from portfolio_valuation.models import UserShareSnapshot
-from django.core.exceptions import ValidationError
+from django.db.models import Sum, Case, When, F, DecimalField
+from transactions.models import Transaction
+from decimal import Decimal
 
 @require_GET
 def get_portfolio_valuations(request):
@@ -33,6 +35,40 @@ def get_portfolio_valuations(request):
     return JsonResponse({
         "status": "success",
         "data": data
+    })
+
+@require_GET
+def get_portfolio_stock(request):
+    """
+    Get current stock holdings based on buy/sell transactions.
+    """
+
+    # Aggregate buy/sell transactions to find net quantity per ticker
+    asset_tx = (
+        Transaction.objects
+        .filter(type__in=["buy", "sell"])
+        .values("ticker")
+        .annotate(
+            total_qty=Sum(
+                Case(
+                    When(type="buy", then=F("shares")),
+                    When(type="sell", then=-F("shares")),
+                    default=Decimal("0"),
+                    output_field=DecimalField(),
+                )
+            )
+        )
+    )
+
+    stocks = {}
+
+    for item in asset_tx:
+        if item["total_qty"] > 0:
+            stocks[item["ticker"]] = Decimal(item["total_qty"])
+
+    return JsonResponse({
+        "status": "success",
+        "data": stocks
     })
 
 class UserShareSnapshotView(View):
