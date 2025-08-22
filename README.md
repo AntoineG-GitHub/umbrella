@@ -46,11 +46,10 @@ pwd: 123456
 
 
 to connect to EC instance:  ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
-to copy to the instance: scp -i umbrella-key-ec2.pem -r ./apps ec2-user@51.21.224.128:/home/ec2-user/umbrella_app 
 
 python .\manage.py createsuperuser
 ssh -i umbrella-key-ec2.pem ec2-user@51.21.224.128
 
-docker build -t umbrella-app .
+docker build --rm -t umbrella-app:latest .
 
-docker run -d --name umbrella-app-container -p 8000:8000   --env-file /home/ec2-user/umbrella/.env   -v /home/ec2-user/umbrella/database/db.sqlite3:/database/db.sqlite3   umbrella-app:latest
+docker run -d --name umbrella-app-container -p 8000:8000   --env-file /home/ec2-user/umbrella_app/umbrella/.env   -v /home/ec2-user/umbrella_app/umbrella/database/db.sqlite3:/database/db.sqlite3   umbrella-app:latest
