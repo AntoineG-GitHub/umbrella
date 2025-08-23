@@ -4,6 +4,7 @@ from data_ingestion.models import BaseHistoricalExchangeRate
 import logging
 from datetime import datetime, timedelta
 import pandas as pd
+from transactions.models import Transaction
 
 logger = logging.getLogger(__name__)
 
@@ -67,12 +68,42 @@ class StockPriceService:
         # Forward fill to replace empty values with previous day's data
         df = df.ffill()
 
+        # --------------------------
+        # Compute NAV field
+        # --------------------------
+        # Get the date of the first transaction from the Transaction table
+        first_transaction = Transaction.objects.order_by('date').first()
+        if first_transaction:
+            base_date = first_transaction.date
+            # Ensure base_date is normalized to match df.index
+            base_date = pd.to_datetime(base_date).normalize()
+        else:
+            logger.warning("No transactions found in the Transaction table, NAV will be None")
+            base_date = None
+
+        if base_date in df.index:
+            base_price = float(df.loc[base_date]["4. close"])
+            df["nav"] = df["4. close"].astype(float) / base_price
+        else:
+            logger.warning(f"Base date {base_date.date()} not in data for {ticker}, NAV will be None")
+            df["nav"] = None
+
+        # --------------------------
+        # Merge with exchange rates
+        # --------------------------
         currency, exchange_rates = self._get_currency(ticker)
 
         merged = {}
-        for date, price_data in prices.items():
-            exchange_rate = exchange_rates.get(date, {}).get("4. close", 1)
-            merged[date] = {**price_data, "exchange_rate": exchange_rate}
+        for date, row in df.iterrows():
+            date_str = date.strftime("%Y-%m-%d")
+            price_data = row.to_dict()
+            exchange_rate = exchange_rates.get(date_str, {}).get("4. close", 1)
+
+            merged[date_str] = {
+                **price_data,
+                "exchange_rate": exchange_rate,
+                "nav": float(row["nav"]),
+            }
 
         self.repo.ensure_table_exists()
         logger.info(f"Saving daily prices for {ticker} in {currency}")

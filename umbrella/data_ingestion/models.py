@@ -16,6 +16,7 @@ class HistoricalPrice(models.Model):
     high_euro = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     low_euro = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     close_euro = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    nav = models.DecimalField(max_digits=10, decimal_places=4, null=True)
     date = models.DateField()
 
 class BaseHistoricalExchangeRate(models.Model):

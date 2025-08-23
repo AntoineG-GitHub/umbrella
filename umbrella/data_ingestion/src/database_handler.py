@@ -37,6 +37,7 @@ class DatabaseHandler:
                 high_euro=float(value.get("2. high")) * float(rate) if rate else None,
                 low_euro=float(value.get("3. low")) * float(rate) if rate else None,
                 close_euro=float(value.get("4. close")) * float(rate) if rate else None,
+                nav=value.get("nav")
             )
 
     def save_company_information(self, ticker, data: dict):

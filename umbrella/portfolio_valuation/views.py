@@ -5,7 +5,9 @@ from portfolio_valuation.models import DailyPortfolioSnapshot
 from django.forms.models import model_to_dict
 from django.views import View
 from portfolio_valuation.models import UserShareSnapshot
-from django.core.exceptions import ValidationError
+from django.db.models import Sum, Case, When, F, DecimalField
+from transactions.models import Transaction
+from decimal import Decimal
 
 @require_GET
 def get_portfolio_valuations(request):
@@ -35,22 +37,57 @@ def get_portfolio_valuations(request):
         "data": data
     })
 
+@require_GET
+def get_portfolio_stock(request):
+    """
+    Get current stock holdings based on buy/sell transactions.
+    """
+
+    # Aggregate buy/sell transactions to find net quantity per ticker
+    asset_tx = (
+        Transaction.objects
+        .filter(type__in=["buy", "sell"])
+        .values("ticker")
+        .annotate(
+            total_qty=Sum(
+                Case(
+                    When(type="buy", then=F("shares")),
+                    When(type="sell", then=-F("shares")),
+                    default=Decimal("0"),
+                    output_field=DecimalField(),
+                )
+            )
+        )
+    )
+
+    stocks = {}
+
+    for item in asset_tx:
+        if item["total_qty"] > 0:
+            stocks[item["ticker"]] = Decimal(item["total_qty"])
+
+    return JsonResponse({
+        "status": "success",
+        "data": stocks
+    })
+
 class UserShareSnapshotView(View):
     def get(self, request, user_id):
         start_date_str = request.GET.get("start_date")
         end_date_str = request.GET.get("end_date")
 
-        try:
-            start_date = parse_date(start_date_str)
-            end_date = parse_date(end_date_str)
-            if not start_date or not end_date:
-                raise ValidationError("Invalid date format.")
-        except Exception:
-            return JsonResponse({"error": "Invalid or missing date format (YYYY-MM-DD expected)."}, status=400)
+        start_date = parse_date(start_date_str) if start_date_str else None
+        end_date = parse_date(end_date_str) if end_date_str else None
 
-        snapshots = UserShareSnapshot.objects.filter(
-            user_id=user_id, date__range=[start_date, end_date]
-        ).order_by("date")
+        snapshots_query = UserShareSnapshot.objects.filter(user_id=user_id)
+        if start_date and end_date:
+            snapshots_query = snapshots_query.filter(date__range=[start_date, end_date])
+        elif start_date:
+            snapshots_query = snapshots_query.filter(date__gte=start_date)
+        elif end_date:
+            snapshots_query = snapshots_query.filter(date__lte=end_date)
+
+        snapshots = snapshots_query.order_by("date")
 
         data = [
             {
