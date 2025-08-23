@@ -14,6 +14,35 @@ class YahooFinanceClient:
         Initialize the Yahoo Finance client.
         No API key is needed for Yahoo Finance.
         """
+        self.YAHOO_TO_MODEL = {
+            "longName": "Name",
+            "longBusinessSummary": "Description",
+            "sector": "Sector",
+            "industry": "Industry",
+            "currency": "Currency",
+            "marketCap": "MarketCapitalization",
+            "ebitda": "EBITDA",
+            "epsTrailingTwelveMonths": "EPS",
+            "trailingPE": "PERatio",
+            "dividendYield": "DividendYield",
+            "dividendRate": "DividendPerShare",
+            # Analyst ratings don’t exist in yfinance’s `.info` (need another endpoint) → leave None
+            "trailingPE": "TrailingPE",
+            "forwardPE": "ForwardPE",
+            "priceToSalesTrailing12Months": "PriceToSalesRatioTTM",
+            "priceToBook": "PriceToBookRatio",
+            # EV/EBITDA not directly available in yfinance (requires manual calc)
+            "beta": "Beta",
+            "fiftyTwoWeekHigh": "52WeekHigh",
+            "fiftyTwoWeekLow": "52WeekLow",
+            "fiftyDayAverage": "50DayMovingAverage",
+            "twoHundredDayAverage": "200DayMovingAverage",
+            "sharesOutstanding": "SharesOutstanding",
+            "dividendDate": "DividendDate",
+            "exDividendDate": "ExDividendDate",
+        }
+
+
         pass
 
     def get_daily_time_series(self, ticker: str) -> dict:
@@ -54,6 +83,19 @@ class YahooFinanceClient:
     def get_overview(self, ticker: str) -> dict:
         stock = yf.Ticker(ticker)
         stock_info = stock.info
-        stock_info["Currency"] = stock_info["currency"]
+        mapped_data = self.map_yahoo_to_model(stock_info)
+        try:
+            mapped_data["DividendDate"] = datetime.utcfromtimestamp(mapped_data["DividendDate"]).date()
+            mapped_data["ExDividendDate"] = datetime.utcfromtimestamp(mapped_data["ExDividendDate"]).date()
+        except Exception:
+            mapped_data["DividendDate"] =  None
+            mapped_data["ExDividendDate"] =  None
 
-        return stock.info
+        return mapped_data
+
+    def map_yahoo_to_model(self, stock_info: dict) -> dict:
+        mapped = {}
+        for yahoo_field, model_field in self.YAHOO_TO_MODEL.items():
+            if yahoo_field in stock_info:
+                mapped[model_field] = stock_info[yahoo_field]
+        return mapped
