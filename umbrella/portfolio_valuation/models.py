@@ -6,6 +6,7 @@ class DailyPortfolioSnapshot(models.Model):
     total_value = models.DecimalField(max_digits=20, decimal_places=2)  # in EUR
     total_units = models.DecimalField(max_digits=20, decimal_places=8)  # shares outstanding
     nav_per_unit = models.DecimalField(max_digits=20, decimal_places=8, default=Decimal("1.0"))
+    nav_returns = models.DecimalField(max_digits=10, decimal_places=4, default=Decimal("0.0"))
     gain_or_loss = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.0"))
     cash = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.0"))
     portfolio_total_value = models.DecimalField(max_digits=20, decimal_places=2, default=Decimal("0.0"))

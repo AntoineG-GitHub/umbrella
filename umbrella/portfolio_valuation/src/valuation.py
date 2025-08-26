@@ -7,7 +7,7 @@ from transactions.models import Transaction
 from portfolio_valuation.models import DailyPortfolioSnapshot, UserShareSnapshot
 
 from .pricing import get_investment_value
-from .nav import get_previous_units, get_previous_user_units, get_nav_per_unit
+from .nav import get_previous_units, get_previous_user_units, get_nav_per_unit, get_daily_returns
 from .metrics import compute_total_metrics
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -24,9 +24,10 @@ class ValuationService:
         logger.debug(f"Portfolio value: {fund_value}")
 
         nav = get_nav_per_unit(self.date)
+        nav_returns = get_daily_returns(self.date, nav)
         prev_units = get_previous_units(self.date)
         prev_user_units = get_previous_user_units(self.date)
-        logger.debug(f"Previous NAV: {nav}, Total units: {prev_units}")
+        logger.debug(f"NAV: {nav}, Total units: {prev_units}, Returns: {nav_returns}")
 
         new_user_units = {}
         total_units = prev_units
@@ -56,6 +57,7 @@ class ValuationService:
                 "total_value": fund_value,
                 "total_units": total_units,
                 "nav_per_unit": nav,
+                "nav_returns": nav_returns,
                 "gain_or_loss": gain_or_loss,
                 "cash": cash,
                 "net_inflows": inflows,
