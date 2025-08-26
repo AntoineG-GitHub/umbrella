@@ -8,8 +8,17 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t umbrella-app:latest .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
     strategy:
       max-parallel: 4
       matrix:
@@ -33,4 +42,4 @@ jobs:
 
     - name: Run Tests
       run: |
-        poetry run python umbrella/manage.py test
+        poetry run python manage.py test
