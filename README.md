@@ -31,3 +31,7 @@ Start in background: docker compose up -d
 View logs: docker compose logs -f
 Restart after updating code: docker compose up -d --build
 Stop the containers: docker compose down
+
+For front end:
+docker build -t front-umbrella . 
+docker run -d --name umbrella-front -p 4200:80 front-umbrella file /home/ec2-user
