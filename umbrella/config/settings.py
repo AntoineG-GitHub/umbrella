@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'transactions',
     'portfolio_valuation',
     'users',
+    'risk_management',
     'corsheaders',
 ]
 
