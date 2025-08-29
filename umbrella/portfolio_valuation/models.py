@@ -34,3 +34,12 @@ class UserShareSnapshot(models.Model):
 
     class Meta:
         unique_together = ("date", "user_id")
+
+class PortfolioCompositionSnapshot(models.Model):
+    date = models.DateField()
+    ticker = models.CharField(max_length=32)
+    quantity = models.DecimalField(max_digits=20, decimal_places=8)
+    value_eur = models.DecimalField(max_digits=20, decimal_places=2)
+
+    class Meta:
+        unique_together = ("date", "ticker")

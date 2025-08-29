@@ -1,5 +1,5 @@
 from django.contrib import admin
-from portfolio_valuation.models import DailyPortfolioSnapshot, UserShareSnapshot
+from portfolio_valuation.models import DailyPortfolioSnapshot, UserShareSnapshot, PortfolioCompositionSnapshot
 
 @admin.register(DailyPortfolioSnapshot)
 class DailyPortfolioSnapshotAdmin(admin.ModelAdmin):
@@ -14,3 +14,10 @@ class UserShareSnapshotAdmin(admin.ModelAdmin):
     ordering = ("-date",)
     search_fields = ("date",)
     list_filter = ("date",)
+
+@admin.register(PortfolioCompositionSnapshot)
+class PortfolioCompositionSnapshotAdmin(admin.ModelAdmin):
+    list_display = ("date", "ticker", "quantity", "value_eur")
+    ordering = ("-date",)
+    search_fields = ("date", "ticker")
+    list_filter = ("date", "ticker")

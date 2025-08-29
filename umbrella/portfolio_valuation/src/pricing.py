@@ -53,4 +53,4 @@ def get_investment_value(date) -> Decimal:
     
     logger.info(f"Assets in the portfolio: {asset_values}")
 
-    return total_value
+    return total_value, asset_tx
