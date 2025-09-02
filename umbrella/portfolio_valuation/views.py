@@ -98,4 +98,4 @@ class UserShareSnapshotView(View):
             for snapshot in snapshots
         ]
 
-        return JsonResponse({"user_id": user_id, "snapshots": data})
+        return JsonResponse({"status": "succes", "user_id": user_id, "data": data})
